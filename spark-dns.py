@@ -18,11 +18,11 @@ def verify_cert(cert, hostname):
     # service_identity.pyopenssl.verify_hostname(client_ssl, hostname)
     # issuer
 
-def get_certificate(hostname, port):
+def get_certificate(hostname):
     hostname_idna = idna.encode(hostname)
     sock = socket()
 
-    sock.connect((hostname, port))
+    sock.connect((hostname, 433))
     peername = sock.getpeername()
     ctx = SSL.Context(SSL.SSLv23_METHOD) # most compatible
     ctx.check_hostname = False
@@ -79,8 +79,8 @@ def print_basic_info(hostinfo):
     )
     print(s)
 
-def check_it_out(hostname, port):
-    hostinfo = get_certificate(hostname, port)
+def check_it_out(hostname):
+    hostinfo = get_certificate(hostname)
     print_basic_info(hostinfo)
 
 app = FastAPI()
@@ -90,12 +90,8 @@ async def check_domain(domain: str, response: Response):
     response.headers["Access-Control-Allow-Origin"] = "*"
     search = checkdmarc.check_domains([domain], include_dmarc_tag_descriptions=True)
 
-    HOSTS = [
-        domain, 433
-    ]
-    
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as e:
-        for hostinfo in e.map(lambda x: get_certificate(x[0], x[1]), HOSTS):
+        for hostinfo in e.map(lambda x: get_certificate(x[0], x[1]), domain):
             print_basic_info(hostinfo)
 
 
