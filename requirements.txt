@@ -1,6 +1,6 @@
 checkdmarc==4.3.1
 uvicorn==0.12.2
 fastapi==0.61.2
-cryptography==3.2.1
+cryptography==3.2.2
 idna==2.9
 pyOpenSSL==19.1.0
